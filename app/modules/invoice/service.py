@@ -15,6 +15,10 @@ from app.modules.invoice.schemas import (
     ExtractedInvoiceResponse,
 )
 from app.modules.invoice.validator import ValidationResult, validate_invoice
+from app.modules.pending.repository import (
+    PendingRepositoryError,
+    mark_pending_invoice_saved,
+)
 
 
 class InvoiceServiceError(Exception):
@@ -80,6 +84,9 @@ def approve_and_save_invoice(
     """
     Validate and persist an approved invoice.
 
+    When pending_invoice_id is set, links the saved invoice back to the
+    pending Gmail queue row (status=saved, approved_invoice_id).
+
     Args:
         invoice: User-reviewed invoice data ready for approval.
 
@@ -90,14 +97,24 @@ def approve_and_save_invoice(
         InvoiceValidationError: If validation errors are present.
         InvoicePersistenceError: If the database save fails.
     """
+    pending_invoice_id = invoice.pending_invoice_id
+
     validation = validate_invoice(invoice)
     if not validation.is_valid:
         raise InvoiceValidationError(validation.errors, validation.warnings)
 
     try:
-        return save_invoice(invoice)
+        saved = save_invoice(invoice)
     except RepositoryError as exc:
         raise InvoicePersistenceError(str(exc)) from exc
+
+    if pending_invoice_id is not None:
+        try:
+            mark_pending_invoice_saved(pending_invoice_id, saved.id)
+        except PendingRepositoryError as exc:
+            raise InvoicePersistenceError(str(exc)) from exc
+
+    return saved
 
 
 def list_saved_invoices() -> list[ApprovedInvoiceResponse]:

@@ -1,9 +1,6 @@
-from pathlib import Path
-from uuid import uuid4
-
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
-from app.config import get_settings
+from app.core.exceptions import InvoiceAutomationError, UnsupportedFileTypeError
 from app.modules.invoice.extractor import InvoiceExtractionError
 from app.modules.invoice.schemas import (
     ApprovedInvoiceRequest,
@@ -19,6 +16,7 @@ from app.modules.invoice.service import (
     get_saved_invoice,
     list_saved_invoices,
 )
+from app.utils.file_handler import save_pdf_bytes
 
 router = APIRouter(prefix="/invoices", tags=["invoices"])
 
@@ -28,21 +26,19 @@ async def extract_invoice_from_upload(
     file: UploadFile = File(..., description="PDF invoice file"),
 ) -> ExtractedInvoiceResponse:
     """Upload a PDF invoice and extract structured data."""
-    if not file.filename or not file.filename.lower().endswith(".pdf"):
+    try:
+        saved_path = save_pdf_bytes(await file.read(), file.filename or "invoice.pdf")
+        return extract_invoice(saved_path)
+    except UnsupportedFileTypeError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only PDF files are supported.",
-        )
-
-    settings = get_settings()
-    upload_dir = Path(settings.upload_dir)
-    upload_dir.mkdir(parents=True, exist_ok=True)
-
-    saved_path = upload_dir / f"{uuid4()}_{Path(file.filename).name}"
-    saved_path.write_bytes(await file.read())
-
-    try:
-        return extract_invoice(saved_path)
+            detail=str(exc),
+        ) from exc
+    except InvoiceAutomationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
     except InvoiceExtractionError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

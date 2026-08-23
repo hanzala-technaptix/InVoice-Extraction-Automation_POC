@@ -109,6 +109,10 @@ class ApprovedInvoiceRequest(BaseModel):
         min_items=1,
         description="Invoice line items (at least one required)",
     )
+    pending_invoice_id: Optional[int] = Field(
+        default=None,
+        description="Pending invoice to mark saved after approval (Gmail flow)",
+    )
 
 
 class ApprovedInvoiceResponse(BaseModel):

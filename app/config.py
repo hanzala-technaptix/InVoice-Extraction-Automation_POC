@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -28,6 +28,27 @@ class Settings(BaseSettings):
     database_url: str = Field(
         default="sqlite:///data/invoice.db",
         description="SQLite database URL",
+    )
+
+    # Gmail IMAP (app password — no OAuth client ID required for POC)
+    gmail_email: str = Field(default="", description="Gmail address for IMAP")
+    gmail_app_password: str = Field(
+        default="",
+        validation_alias=AliasChoices("GMAIL_APP_PASSWORD", "GMAIL_PASSWORD"),
+        description="Gmail 16-character app password",
+    )
+    gmail_query: str = Field(
+        default="has:attachment filename:pdf",
+        description="Gmail search query for invoice PDF messages",
+    )
+    gmail_poll_enabled: bool = Field(
+        default=True,
+        description="Enable background Gmail polling on server startup",
+    )
+    gmail_poll_interval_seconds: int = Field(
+        default=120,
+        ge=30,
+        description="Seconds between Gmail inbox polls",
     )
 
     model_config = SettingsConfigDict(

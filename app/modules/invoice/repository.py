@@ -23,6 +23,8 @@ class RepositoryError(Exception):
 
 def init_db() -> None:
     """Create database tables if they do not exist."""
+    import app.modules.pending.models  # noqa: F401 — register PendingInvoice with Base
+
     engine = _get_engine()
     Base.metadata.create_all(bind=engine)
 

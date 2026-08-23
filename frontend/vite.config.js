@@ -14,6 +14,14 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
+      '/gmail': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/pending-invoices': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
     },
   },
 })

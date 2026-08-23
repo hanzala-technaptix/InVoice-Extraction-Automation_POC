@@ -26,15 +26,32 @@ async def save_uploaded_pdf(file: UploadFile) -> Path:
         UnsupportedFileTypeError: If the file is not a supported PDF.
         InvoiceAutomationError: If the uploaded file is empty.
     """
-    _validate_pdf_filename(file.filename)
-
     content = await file.read()
+    return save_pdf_bytes(content, file.filename or "invoice.pdf")
+
+
+def save_pdf_bytes(content: bytes, filename: str) -> Path:
+    """
+    Validate and save PDF bytes to the configured upload directory.
+
+    Args:
+        content: Raw PDF file bytes.
+        filename: Original filename used for validation and sanitization.
+
+    Returns:
+        Path to the saved PDF on disk.
+
+    Raises:
+        UnsupportedFileTypeError: If the filename or content is not a valid PDF.
+        InvoiceAutomationError: If the file is empty.
+    """
+    _validate_pdf_filename(filename)
     _validate_pdf_content(content)
 
     upload_dir = Path(get_settings().upload_dir)
     upload_dir.mkdir(parents=True, exist_ok=True)
 
-    saved_path = upload_dir / _generate_unique_filename(file.filename)
+    saved_path = upload_dir / _generate_unique_filename(filename)
     saved_path.write_bytes(content)
 
     return saved_path

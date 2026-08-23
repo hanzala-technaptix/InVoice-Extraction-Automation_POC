@@ -75,8 +75,11 @@ export async function extractInvoice(file) {
   return data
 }
 
-export async function approveInvoice(invoice) {
-  const { data } = await api.post('/invoices/approve', invoice)
+export async function approveInvoice(invoice, pendingInvoiceId = null) {
+  const payload = pendingInvoiceId
+    ? { ...invoice, pending_invoice_id: pendingInvoiceId }
+    : invoice
+  const { data } = await api.post('/invoices/approve', payload)
   return data
 }
 

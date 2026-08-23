@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import InvoicePage from './pages/InvoicePage'
 import InvoiceHistoryPage from './pages/InvoiceHistoryPage'
+import PendingReviewPage from './pages/PendingReviewPage'
 import { getHealth } from './services/invoiceApi'
 
 function App() {
@@ -56,6 +57,16 @@ function App() {
             </button>
             <button
               type="button"
+              className={`nav-link ${view === 'pending' ? 'is-active' : ''}`}
+              onClick={() => {
+                setView('pending')
+                setSelectedInvoiceId(null)
+              }}
+            >
+              Pending Review
+            </button>
+            <button
+              type="button"
               className={`nav-link ${view === 'history' ? 'is-active' : ''}`}
               onClick={() => {
                 setView('history')
@@ -78,6 +89,13 @@ function App() {
       <main className="app-main">
         {view === 'process' ? (
           <InvoicePage
+            onViewSaved={() => {
+              setView('history')
+              setSelectedInvoiceId(null)
+            }}
+          />
+        ) : view === 'pending' ? (
+          <PendingReviewPage
             onViewSaved={() => {
               setView('history')
               setSelectedInvoiceId(null)
