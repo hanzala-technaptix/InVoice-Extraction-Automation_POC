@@ -27,8 +27,11 @@ async def extract_invoice_from_upload(
 ) -> ExtractedInvoiceResponse:
     """Upload a PDF invoice and extract structured data."""
     try:
-        saved_path = save_pdf_bytes(await file.read(), file.filename or "invoice.pdf")
-        return extract_invoice(saved_path)
+        content = await file.read()
+        filename = file.filename or "invoice.pdf"
+        save_pdf_bytes(content, filename, source="invoices")
+        extract_path = save_pdf_bytes(content, filename, source="manual")
+        return extract_invoice(extract_path)
     except UnsupportedFileTypeError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

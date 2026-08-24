@@ -39,8 +39,7 @@ env/
 *.sqlite3
 
 # Uploaded files
-data/uploads/*
-!data/uploads/.gitkeep
+data/uploads/**
 
 # IDE
 .vscode/

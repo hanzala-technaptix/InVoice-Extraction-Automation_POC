@@ -1,5 +1,4 @@
 from functools import lru_cache
-from pathlib import Path
 
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -58,11 +57,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    def __init__(self, **kwargs):
-        """Initialize settings and ensure required directories exist."""
-        super().__init__(**kwargs)
-        # Create upload directory if it doesn't exist
-        Path(self.upload_dir).mkdir(parents=True, exist_ok=True)
 
 
 @lru_cache()
