@@ -22,8 +22,13 @@ export async function getPendingInvoiceById(pendingId) {
   return data
 }
 
+export async function deletePendingInvoice(pendingId) {
+  await api.delete(`/pending-invoices/${pendingId}`)
+}
+
 export default {
   getPendingInvoices,
   getPendingInvoiceById,
+  deletePendingInvoice,
   parseApiError,
 }

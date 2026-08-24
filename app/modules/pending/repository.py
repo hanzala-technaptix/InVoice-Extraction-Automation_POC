@@ -181,6 +181,30 @@ def mark_pending_invoice_saved(
         session.close()
 
 
+def delete_pending_invoice(pending_id: int) -> None:
+    """Remove a pending invoice from the review queue."""
+    session = _get_session()
+    try:
+        pending = session.get(PendingInvoice, pending_id)
+        if pending is None:
+            raise PendingRepositoryError(f"Pending invoice {pending_id} not found.")
+        if pending.status == PendingInvoiceStatus.SAVED:
+            raise PendingRepositoryError(
+                "Cannot delete a pending invoice that was already saved."
+            )
+
+        session.delete(pending)
+        session.commit()
+    except PendingRepositoryError:
+        session.rollback()
+        raise
+    except SQLAlchemyError as exc:
+        session.rollback()
+        raise PendingRepositoryError("Failed to delete pending invoice.") from exc
+    finally:
+        session.close()
+
+
 def _to_pending_summary(pending: PendingInvoice) -> PendingInvoiceSummary:
     return PendingInvoiceSummary(
         id=pending.id,

@@ -161,14 +161,15 @@ function InvoicePage({ onViewSaved }) {
 
   if (phase === PHASE.SAVED && saved) {
     return (
-      <>
+      <div className="page-workspace">
         <WorkflowSteps phase={phase} />
-        <h2 className="page-title">Invoice saved successfully</h2>
-        <div className="alert alert--success">The invoice has been saved to the database.</div>
+        <div className="page-workspace__body">
+          <h2 className="page-title">Invoice saved successfully</h2>
+          <div className="alert alert--success">The invoice has been saved to the database.</div>
 
-        <div className="card">
-          <div className="card__body">
-            <div className="summary-grid">
+          <div className="card card--flat">
+            <div className="card__body">
+              <div className="summary-grid">
               <div className="summary-item">
                 <span className="summary-item__label">Invoice Number</span>
                 <span className="summary-item__value">{saved.invoice_number}</span>
@@ -193,36 +194,40 @@ function InvoicePage({ onViewSaved }) {
                   <span className="status-badge">Saved</span>
                 </span>
               </div>
-            </div>
+              </div>
 
-            <div className="actions">
-              <button type="button" className="btn btn-primary" onClick={reset}>
-                Process Another Invoice
-              </button>
-              <button type="button" className="btn btn-secondary" onClick={onViewSaved}>
-                View Saved Invoices
-              </button>
+              <div className="actions">
+                <button type="button" className="btn btn-primary" onClick={reset}>
+                  Process Another Invoice
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={onViewSaved}>
+                  View Saved Invoices
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </>
+      </div>
     )
   }
 
   if (phase === PHASE.PROCESSING) {
     return (
-      <>
+      <div className="page-workspace">
         <WorkflowSteps phase={phase} />
-        <InvoicePreview phase="processing" />
-      </>
+        <div className="page-workspace__body">
+          <InvoicePreview phase="processing" />
+        </div>
+      </div>
     )
   }
 
   if (phase === PHASE.REVIEW && form) {
     return (
-      <>
+      <div className="page-workspace">
         <WorkflowSteps phase={phase} />
-        <InvoiceReviewPanel
+        <div className="page-workspace__body">
+          <InvoiceReviewPanel
           key="manual-review"
           initialForm={form}
           gmailSource={
@@ -240,53 +245,53 @@ function InvoicePage({ onViewSaved }) {
             setPhase(PHASE.SAVED)
           }}
         />
-      </>
+        </div>
+      </div>
     )
   }
 
   return (
-    <>
+    <div className="page-workspace">
       <WorkflowSteps phase={phase} />
-      <h2 className="page-title">Import Invoice</h2>
-      <p className="page-lead">
-        Upload a PDF manually or import a PDF attachment from Gmail, then review before saving.
-      </p>
+      <div className="page-workspace__body">
+        <h2 className="page-title">Import Invoice</h2>
+        <p className="page-lead">
+          Upload a PDF manually or import a PDF attachment from Gmail, then review before saving.
+        </p>
 
-      <InputSourceTabs
-        mode={inputMode}
-        onChange={setInputMode}
-        disabled={extracting}
-      />
+        <InputSourceTabs
+          mode={inputMode}
+          onChange={setInputMode}
+          disabled={extracting}
+        />
 
-      {inputMode === INPUT_MODE.MANUAL ? (
-        <>
+        {inputMode === INPUT_MODE.MANUAL ? (
           <InvoiceUpload
             file={file}
             onSelect={handleFileSelect}
             disabled={extracting}
             error={bannerError}
+            footer={
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleExtract}
+                disabled={!file || extracting}
+              >
+                Extract Invoice
+              </button>
+            }
           />
-
-          <div className="actions">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleExtract}
-              disabled={!file || extracting}
-            >
-              Extract Invoice
-            </button>
-          </div>
-        </>
-      ) : (
-        <GmailPanel
-          disabled={extracting}
-          onExtractStart={handleGmailExtractStart}
-          onExtracted={handleGmailExtracted}
-          onExtractError={handleGmailExtractError}
-        />
-      )}
-    </>
+        ) : (
+          <GmailPanel
+            disabled={extracting}
+            onExtractStart={handleGmailExtractStart}
+            onExtracted={handleGmailExtracted}
+            onExtractError={handleGmailExtractError}
+          />
+        )}
+      </div>
+    </div>
   )
 }
 

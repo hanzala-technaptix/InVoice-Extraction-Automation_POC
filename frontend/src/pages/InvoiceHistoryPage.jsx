@@ -85,24 +85,25 @@ function InvoiceHistoryPage({ selectedInvoiceId, onSelectInvoice, onBack, onProc
     }
 
     return (
-      <>
-        <div className="actions" style={{ marginTop: 0 }}>
-          <button type="button" className="btn btn-secondary" onClick={onBack}>
-            Back to Saved Invoices
-          </button>
-          <button type="button" className="btn btn-text" onClick={onProcessAnother}>
-            Process Another Invoice
-          </button>
-        </div>
+      <div className="page-workspace">
+        <div className="page-workspace__body">
+          <div className="actions" style={{ marginTop: 0 }}>
+            <button type="button" className="btn btn-secondary" onClick={onBack}>
+              Back to Saved Invoices
+            </button>
+            <button type="button" className="btn btn-text" onClick={onProcessAnother}>
+              Process Another Invoice
+            </button>
+          </div>
 
-        <h2 className="page-title">Invoice Details</h2>
-        <p className="page-lead">
-          {detail.invoice_number} · {detail.vendor_name}
-        </p>
+          <h2 className="page-title">Invoice Details</h2>
+          <p className="page-lead">
+            {detail.invoice_number} · {detail.vendor_name}
+          </p>
 
-        {error ? <div className="alert alert--error">{error}</div> : null}
+          {error ? <div className="alert alert--error">{error}</div> : null}
 
-        <div className="card">
+          <div className="card card--flat">
           <div className="card__head">
             <h3 className="card__title">Invoice Information</h3>
           </div>
@@ -152,11 +153,11 @@ function InvoiceHistoryPage({ selectedInvoiceId, onSelectInvoice, onBack, onProc
           </div>
         </div>
 
-        <div className="card">
+        <div className="card card--flat">
           <div className="card__head">
             <h3 className="card__title">Line Items</h3>
           </div>
-          <div className="card__body">
+          <div className="card__body card__body--flush">
             <div className="table-scroll">
               <table className="data-table">
                 <thead>
@@ -183,19 +184,21 @@ function InvoiceHistoryPage({ selectedInvoiceId, onSelectInvoice, onBack, onProc
             </div>
           </div>
         </div>
-      </>
+        </div>
+      </div>
     )
   }
 
   return (
-    <>
-      <h2 className="page-title">Saved Invoices</h2>
-      <p className="page-lead">Approved invoices stored in the application database.</p>
+    <div className="page-workspace">
+      <div className="page-workspace__body">
+        <h2 className="page-title">Saved Invoices</h2>
+        <p className="page-lead">Approved invoices stored in the application database.</p>
 
-      {error ? <div className="alert alert--error">{error}</div> : null}
+        {error ? <div className="alert alert--error">{error}</div> : null}
 
-      <div className="card">
-        <div className="card__body">
+        <div className="card card--flat">
+          <div className="card__body card__body--flush">
           {loadingList ? (
             <div className="empty">Loading saved invoices…</div>
           ) : invoices.length === 0 ? (
@@ -236,7 +239,8 @@ function InvoiceHistoryPage({ selectedInvoiceId, onSelectInvoice, onBack, onProc
           )}
         </div>
       </div>
-    </>
+      </div>
+    </div>
   )
 }
 

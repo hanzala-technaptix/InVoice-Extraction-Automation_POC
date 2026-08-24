@@ -6,7 +6,7 @@ function formatBytes(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function InvoiceUpload({ file, onSelect, disabled, error }) {
+function InvoiceUpload({ file, onSelect, disabled, error, footer }) {
   const inputRef = useRef(null)
   const [dragOver, setDragOver] = useState(false)
 
@@ -69,6 +69,7 @@ function InvoiceUpload({ file, onSelect, disabled, error }) {
           </p>
         ) : null}
       </div>
+      {footer ? <div className="card__foot">{footer}</div> : null}
     </div>
   )
 }

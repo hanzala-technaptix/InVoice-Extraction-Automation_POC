@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from app.modules.pending.models import PendingInvoiceStatus
 from app.modules.pending.repository import (
     PendingRepositoryError,
+    delete_pending_invoice,
     get_pending_invoice_by_id,
     list_pending_invoices,
 )
@@ -52,3 +53,26 @@ def get_pending_invoice(pending_id: int) -> PendingInvoiceDetail:
         )
 
     return pending
+
+
+@router.delete("/{pending_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_pending_invoice(pending_id: int) -> None:
+    """Delete a pending invoice from the review queue."""
+    try:
+        delete_pending_invoice(pending_id)
+    except PendingRepositoryError as exc:
+        message = str(exc)
+        if "not found" in message.lower():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=message,
+            ) from exc
+        if "already saved" in message.lower():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=message,
+            ) from exc
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=message,
+        ) from exc
